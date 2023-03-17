@@ -1,0 +1,48 @@
+
+###Teste
+
+GET http://localhost:3003/ping
+
+###Criar usuário
+
+POST http://localhost:3003/users
+Content-Type: application/json
+
+{
+    "name": "Maria",
+    "email": "maria@labenu.com",
+    "password": "654321"
+}
+
+###Mostrar todos os usuários
+
+GET  http://localhost:3003/users
+
+###Cadastrar produtos
+
+POST http://localhost:3003/products
+Content-Type: application/json
+
+{
+    "name": "Short",
+    "price": 18.50,
+    "image_url": "image2.jpg"
+}
+
+###Mostrar todos os produtos
+
+GET http://localhost:3003/products
+
+
+###Criar compra
+
+POST  http://localhost:3003/purchases
+Content-Type: application/json
+
+{
+    "user_id": 1,
+    "quantity": 2,
+    "product_id": 1
+}
+
+
