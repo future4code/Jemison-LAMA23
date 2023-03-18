@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { connection } from "../database/connection";
+import { TProduct } from "../models/TProduct";
 import { TPurchase } from "../models/TPurchase";
 
 export const createPurchase = async (req: Request, res: Response) => {
@@ -13,18 +14,36 @@ export const createPurchase = async (req: Request, res: Response) => {
             throw new Error ("Body inválido")
         }
 
-        const productCompra = await connection ("labecommerce_products").where('id', product_id)
-       
-        const id = Date.now().toString()
-        
-        //const total_price = price * quantity
+        const findUser = await connection("labecommerce_users")
+        .select()
+        .where({id: user_id})
+
+        if (findUser.length === 0) {
+            errorCode = 404
+            throw new Error ("Usuário não encontrado.")
+        }
+
+        const findProduct = await connection ("labecommerce_products")
+        .select()
+        .where({id: product_id})
+
+        if (findProduct.length === 0) {
+            errorCode = 404
+            throw new Error ("Produto não encontrado.")
+        }
+
+        const product: TProduct = {
+            id: findProduct[0].id,
+            name: findProduct[0].name,
+            price: findProduct[0].price
+        }
         
         const newPurchase: TPurchase = {
             id: Date.now().toString(),
             user_id,
             product_id,
             quantity,
-            total_price
+            total_price: product.price * quantity
         }
         await connection("labecommerce_purchases").insert(
             {   id:newPurchase.id,
@@ -33,7 +52,7 @@ export const createPurchase = async (req: Request, res: Response) => {
                 product_id: newPurchase.product_id,
                 total_price: newPurchase.total_price
             } )
-            res.status(200).send("Compra feita com sucesso!", newPurchase)
+            res.status(200).send({message: "Compra feita com sucesso!", purchase: newPurchase})
 
     }catch (error:any){
         res.status(errorCode).send({message:error.message})
